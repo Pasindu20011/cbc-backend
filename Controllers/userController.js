@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
+
 export function createUser (req,res){
 
     const hashedPassword = bcrypt.hashSync(req.body.password,10) 
@@ -56,16 +57,19 @@ User.findOne(
                     role : user.role,
                     isEmailVerified : user.isEmailVerified,
 
-                },"jwt-secret"
+                },process.env.JWT_SECRET
              )
-
-             console.log (user.role)
-
              
              res.json({
                 message : "Login Successfull",
                 token : token,
-                
+                user :{
+                    email : user.email,
+                    firstname : user.firstname,
+                    lastname : user.lastname,
+                    role : user.role,
+                    isEmailVerified : user.isEmailVerified,
+                }         
              })
              
            }else{
@@ -74,13 +78,13 @@ User.findOne(
             })
            }
      }
-    }
+    } 
   )
 }
 
 export function isAdmin(req){
     if (req.user == null){
-        return false;
+        return false; 
     }
     if (req.user.role != "admin"){
         return false

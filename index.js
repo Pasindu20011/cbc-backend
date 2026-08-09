@@ -6,12 +6,19 @@ import userRouter from "./routers/userRouter.js";
 import jwt from "jsonwebtoken";
 import { loginUser } from "./Controllers/userController.js";
 import productRouter from "./routers/productsRouter.js";
+import cors from "cors"; 
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // create express app
 
 const app = express();
 
+
 //....
+
+app.use(cors());
 
 app.use(express.json());
 
@@ -21,7 +28,8 @@ app.use(
        
         if(token!=null){
         token = token.replace("Bearer ","")
-        jwt.verify(token, "jwt-secret",(err,decoded)=>{
+        jwt.verify(token, process.env.JWT_SECRET,
+        (err,decoded)=>{
             if(decoded == null){
                 res.json({
                     message: "invalid token please login"
@@ -36,14 +44,14 @@ app.use(
  next() 
 })
 // use the router           
-
-app.use("/students", studentRouter)
-app.use("/users" , userRouter)
-app.use("/products",productRouter)
+ 
+app.use("/api/students", studentRouter)
+app.use("/api/users" , userRouter)
+app.use("/api/products",productRouter)
 
 // connect the database
 
-const connectionString ="mongodb://admin:00000@ac-klpibuf-shard-00-00.t8hijij.mongodb.net:27017,ac-klpibuf-shard-00-01.t8hijij.mongodb.net:27017,ac-klpibuf-shard-00-02.t8hijij.mongodb.net:27017/?ssl=true&replicaSet=atlas-6iih7s-shard-0&authSource=admin&appName=Cluster0"
+const connectionString = process.env.MONGO_URI
 
 mongoose.connect(connectionString)
 .then(
